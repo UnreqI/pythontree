@@ -8,29 +8,61 @@ def getDirectory() -> Path:
         return Path(".")
     else:
         return Path(sys.argv[1]) # directory is the first argument
-
 """
-def displayDirectory(startingDirectory: list[str]) -> None:
+testdir
+├── balls
+│   └── ily.txt
+├── file.txt
+├── h.txt
+└── uwu
+    ├── hello.txt
+    ├── hell.txt
+    ├── hel.txt
+    ├── he.txt
+    └── h.txt
+
+3 directories, 8 files
+"""
+def getIndentation(isFolder: bool, depth: int) -> str:
+    # for each entry at a particular depth, you want to put the ├ at the start of the depth. but since we're doing one line at a time you would also have to know where there is subdirectory below it as a lower depth to see if you need lines before it too. to me it seems impossible to do this in the way we have since say in the example below
+    pass
+
+def displayDirectory(startingDirectory: Path) -> None:
     # for each entry, check if is a file. if so just print it on a new line, if not then it's a subfolder, if it is a subfolder, then we want to go through each element in the subfolder 
-    depth: int = 0 # how deep in a subdirectory we are 
-    indentation: str = " " # how indentation looks, for example "-", will likely replace this with a funcction that does it smartly, but for now this is fine 
-    i: int = 0 # index through directory 
-    directory: list[str] = startingDirectory # directory we are currently traversing 
-    directoryStack: list[tuple[str, int]] = [] # each directory in the stack is paired with how far it has been explored so far (index i)
+    depth: int = 1 # how deep in a subdirectory we are 
+    indentation: str = "    " # how indentation looks, for example "-", will likely replace this with a funcction that does it smartly, but for now this is fine 
+    directory: Path = startingDirectory # directory we are currently traversing 
+    print(directory.name)
+    directoryStack = [directory.iterdir()] # each directory in the stack is paired with how far it has been explored so far (index i)
 
-    while True:
-        entry = directory[i] # current entry being viewed
-        if sys.
+    while directoryStack:
+        try: 
+            entry = next(directoryStack[-1])# current entry being viewed
+        except StopIteration: # reached the end of the subfolder, go up a level
+            depth -= 1
+            directoryStack.pop()
+            continue
 
-"""
+        if entry.is_file():
+            print(indentation * depth + " " + entry.name)
+        elif entry.is_dir() and not any (entry.iterdir()): # check if directory and if is empty. Python short-circuits so won't produce error 
+            print(indentation * depth + " " + entry.name) # same statement as above because may use a function to do this automatically and might write something different when it's a folder or file 
+        elif entry.is_dir(): # is a non-empty folder, check explicitly because i think symlinks can also exist?
+            print(indentation * depth + " " + entry.name)
+            directoryStack.append(entry.iterdir())
+            depth += 1
+
+
+
 
 
 def main():
     directory: Path = getDirectory()
 
-    for entry in directory.iterdir():
-        print(entry)
+    #for entry in directory.iterdir():
+    #    print(entry)
 
+    displayDirectory(directory) 
     # plan is, for each directory, we want to print it nicely, but if it's a file we just print it, but if it is a sub folder we do something different
 
     # maybe if we want a command line argument --layers=x, where x is an integer >= 1, then we could allow people to choose how many layers deep. 
